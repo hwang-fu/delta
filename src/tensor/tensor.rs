@@ -1,3 +1,5 @@
+use std::ops::{Add, Div, Mul, Neg, Sub};
+
 use crate::tensor::{Shape, Storage};
 
 /// A multi-dimensional array with automatic differentiation support.
@@ -222,6 +224,61 @@ impl Tensor {
         Tensor::from_vec(data, self.shape())
     }
 
+    /// Matrix multiplication: (M, K) @ (K, N) -> (M, N)
+    ///
+    /// Uses the naive O(n³) algorithm. Correctness over performance.
+    ///
+    /// # Panics
+    /// - Panics if tensors are not 2D
+    /// - Panics if inner dimensions don't match
+    ///
+    /// # Example
+    /// ```
+    /// use delta::tensor::Tensor;
+    /// // A: 2x3, B: 3x2 -> C: 2x2
+    /// let a = Tensor::from_vec(vec![1.0, 2.0, 3.0,
+    ///                               4.0, 5.0, 6.0], &[2, 3]);
+    /// let b = Tensor::from_vec(vec![7.0, 8.0,
+    ///                               9.0, 10.0,
+    ///                               11.0, 12.0], &[3, 2]);
+    /// let c = a.matmul(&b);
+    /// assert_eq!(c.shape(), &[2, 2]);
+    /// ```
+    pub fn matmul(&self, other: &Tensor) -> Tensor {
+        assert_eq!(
+            self.ndim(),
+            2,
+            "matmul requires 2D tensors, got {}D",
+            self.ndim()
+        );
+        assert_eq!(
+            other.ndim(),
+            2,
+            "matmul requires 2D tensors, got {}D",
+            other.ndim()
+        );
+
+        let (m, k1) = (self.shape()[0], self.shape()[1]);
+        let (k2, n) = (other.shape()[0], other.shape()[1]);
+        assert_eq!(
+            k1, k2,
+            "Inner dimensions must match: ({}, {}) @ ({}, {})",
+            m, k1, k2, n
+        );
+
+        let mut result = Tensor::zeros(&[m, n]);
+        for i in 0..m {
+            for j in 0..n {
+                let mut sum = 0.0;
+                for k in 0..k1 {
+                    sum += self.get(&[i, k]) * other.get(&[k, j]);
+                }
+                result.set(&[i, j], sum);
+            }
+        }
+        result
+    }
+
     /// Helper for recursive tensor formatting
     fn fmt_recursive(
         &self,
@@ -280,6 +337,173 @@ impl std::fmt::Display for Tensor {
         write!(f, "Tensor(")?;
         self.fmt_recursive(f, 0, &mut 0)?;
         write!(f, ", shape={:?})", self.shape())
+    }
+}
+
+// ----- Neg (unary minus) -----
+
+impl Neg for Tensor {
+    type Output = Tensor;
+    fn neg(self) -> Self::Output {
+        Tensor::neg(&self)
+    }
+}
+
+impl Neg for &Tensor {
+    type Output = Tensor;
+    fn neg(self) -> Self::Output {
+        Tensor::neg(self)
+    }
+}
+
+// ----- Add -----
+
+impl Add<Tensor> for Tensor {
+    type Output = Tensor;
+    fn add(self, rhs: Tensor) -> Self::Output {
+        Tensor::add(&self, &rhs)
+    }
+}
+
+impl Add<&Tensor> for Tensor {
+    type Output = Tensor;
+    fn add(self, rhs: &Tensor) -> Self::Output {
+        Tensor::add(&self, rhs)
+    }
+}
+
+impl Add<Tensor> for &Tensor {
+    type Output = Tensor;
+    fn add(self, rhs: Tensor) -> Self::Output {
+        Tensor::add(self, &rhs)
+    }
+}
+
+impl Add<&Tensor> for &Tensor {
+    type Output = Tensor;
+    fn add(self, rhs: &Tensor) -> Self::Output {
+        Tensor::add(self, rhs)
+    }
+}
+
+// ----- Sub -----
+
+impl Sub<Tensor> for Tensor {
+    type Output = Tensor;
+    fn sub(self, rhs: Tensor) -> Self::Output {
+        Tensor::sub(&self, &rhs)
+    }
+}
+
+impl Sub<&Tensor> for Tensor {
+    type Output = Tensor;
+    fn sub(self, rhs: &Tensor) -> Self::Output {
+        Tensor::sub(&self, rhs)
+    }
+}
+
+impl Sub<Tensor> for &Tensor {
+    type Output = Tensor;
+    fn sub(self, rhs: Tensor) -> Self::Output {
+        Tensor::sub(self, &rhs)
+    }
+}
+
+impl Sub<&Tensor> for &Tensor {
+    type Output = Tensor;
+    fn sub(self, rhs: &Tensor) -> Self::Output {
+        Tensor::sub(self, rhs)
+    }
+}
+
+// ----- Mul (element-wise) -----
+
+impl Mul<Tensor> for Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: Tensor) -> Tensor {
+        Tensor::mul(&self, &rhs)
+    }
+}
+
+impl Mul<&Tensor> for Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: &Tensor) -> Tensor {
+        Tensor::mul(&self, rhs)
+    }
+}
+
+impl Mul<Tensor> for &Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: Tensor) -> Tensor {
+        Tensor::mul(self, &rhs)
+    }
+}
+
+impl Mul<&Tensor> for &Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: &Tensor) -> Tensor {
+        Tensor::mul(self, rhs)
+    }
+}
+
+// ----- Div -----
+
+impl Div<Tensor> for Tensor {
+    type Output = Tensor;
+    fn div(self, rhs: Tensor) -> Tensor {
+        Tensor::div(&self, &rhs)
+    }
+}
+
+impl Div<&Tensor> for Tensor {
+    type Output = Tensor;
+    fn div(self, rhs: &Tensor) -> Tensor {
+        Tensor::div(&self, rhs)
+    }
+}
+
+impl Div<Tensor> for &Tensor {
+    type Output = Tensor;
+    fn div(self, rhs: Tensor) -> Tensor {
+        Tensor::div(self, &rhs)
+    }
+}
+
+impl Div<&Tensor> for &Tensor {
+    type Output = Tensor;
+    fn div(self, rhs: &Tensor) -> Tensor {
+        Tensor::div(self, rhs)
+    }
+}
+
+// ----- Scalar multiplication: Tensor * f32 -----
+
+impl Mul<f32> for Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: f32) -> Tensor {
+        self.scalar_mul(rhs)
+    }
+}
+
+impl Mul<f32> for &Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: f32) -> Tensor {
+        self.scalar_mul(rhs)
+    }
+}
+
+// f32 * Tensor
+impl Mul<Tensor> for f32 {
+    type Output = Tensor;
+    fn mul(self, rhs: Tensor) -> Tensor {
+        rhs.scalar_mul(self)
+    }
+}
+
+impl Mul<&Tensor> for f32 {
+    type Output = Tensor;
+    fn mul(self, rhs: &Tensor) -> Tensor {
+        rhs.scalar_mul(self)
     }
 }
 
@@ -404,7 +628,7 @@ mod tests {
     fn test_add_shape_mismatch() {
         let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
         let b = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
-        a.add(&b);
+        let _ = a.add(&b);
     }
 
     #[test]
@@ -413,5 +637,91 @@ mod tests {
         let s = format!("{}", t);
         assert!(s.contains("Tensor"));
         assert!(s.contains("shape=[2, 3]"));
+    }
+
+    #[test]
+    fn test_operator_add() {
+        let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
+        let b = Tensor::from_vec(vec![3.0, 4.0], &[2]);
+
+        // All 4 variants
+        let c1 = &a + &b;
+        let c2 = a.clone() + &b;
+        let c3 = &a + b.clone();
+        let c4 = a.clone() + b.clone();
+
+        assert_eq!(c1.get(&[0]), 4.0);
+        assert_eq!(c2.get(&[0]), 4.0);
+        assert_eq!(c3.get(&[0]), 4.0);
+        assert_eq!(c4.get(&[0]), 4.0);
+    }
+
+    #[test]
+    fn test_operator_neg() {
+        let a = Tensor::from_vec(vec![1.0, -2.0], &[2]);
+        let b = -&a; // reference version
+        assert_eq!(b.get(&[0]), -1.0);
+        assert_eq!(b.get(&[1]), 2.0);
+
+        let c = -a; // owned version
+        assert_eq!(c.get(&[0]), -1.0);
+    }
+
+    #[test]
+    fn test_operator_scalar_mul() {
+        let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
+
+        let b = &a * 3.0; // Tensor * f32
+        let c = 3.0 * &a; // f32 * Tensor
+
+        assert_eq!(b.get(&[0]), 3.0);
+        assert_eq!(c.get(&[0]), 3.0);
+    }
+
+    #[test]
+    fn test_matmul() {
+        // A: 2x3, B: 3x2 -> C: 2x2
+        let a = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+        let b = Tensor::from_vec(vec![7.0, 8.0, 9.0, 10.0, 11.0, 12.0], &[3, 2]);
+        let c = a.matmul(&b);
+
+        assert_eq!(c.shape(), &[2, 2]);
+        // C[0,0] = 1*7 + 2*9 + 3*11 = 7 + 18 + 33 = 58
+        assert_eq!(c.get(&[0, 0]), 58.0);
+        // C[0,1] = 1*8 + 2*10 + 3*12 = 8 + 20 + 36 = 64
+        assert_eq!(c.get(&[0, 1]), 64.0);
+        // C[1,0] = 4*7 + 5*9 + 6*11 = 28 + 45 + 66 = 139
+        assert_eq!(c.get(&[1, 0]), 139.0);
+        // C[1,1] = 4*8 + 5*10 + 6*12 = 32 + 50 + 72 = 154
+        assert_eq!(c.get(&[1, 1]), 154.0);
+    }
+
+    #[test]
+    fn test_matmul_identity() {
+        // Multiply by identity matrix
+        let a = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+        let eye = Tensor::from_vec(vec![1.0, 0.0, 0.0, 1.0], &[2, 2]);
+        let c = a.matmul(&eye);
+
+        assert_eq!(c.get(&[0, 0]), 1.0);
+        assert_eq!(c.get(&[0, 1]), 2.0);
+        assert_eq!(c.get(&[1, 0]), 3.0);
+        assert_eq!(c.get(&[1, 1]), 4.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "Inner dimensions must match")]
+    fn test_matmul_dimension_mismatch() {
+        let a = Tensor::zeros(&[2, 3]);
+        let b = Tensor::zeros(&[4, 5]); // 3 != 4
+        a.matmul(&b);
+    }
+
+    #[test]
+    #[should_panic(expected = "matmul requires 2D")]
+    fn test_matmul_not_2d() {
+        let a = Tensor::zeros(&[2, 3, 4]); // 3D
+        let b = Tensor::zeros(&[4, 5]);
+        a.matmul(&b);
     }
 }
