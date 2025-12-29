@@ -583,4 +583,43 @@ mod tests {
         assert!(s.contains("Tensor"));
         assert!(s.contains("shape=[2, 3]"));
     }
+
+    #[test]
+    fn test_operator_add() {
+        let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
+        let b = Tensor::from_vec(vec![3.0, 4.0], &[2]);
+
+        // All 4 variants
+        let c1 = &a + &b;
+        let c2 = a.clone() + &b;
+        let c3 = &a + b.clone();
+        let c4 = a.clone() + b.clone();
+
+        assert_eq!(c1.get(&[0]), 4.0);
+        assert_eq!(c2.get(&[0]), 4.0);
+        assert_eq!(c3.get(&[0]), 4.0);
+        assert_eq!(c4.get(&[0]), 4.0);
+    }
+
+    #[test]
+    fn test_operator_neg() {
+        let a = Tensor::from_vec(vec![1.0, -2.0], &[2]);
+        let b = -&a; // reference version
+        assert_eq!(b.get(&[0]), -1.0);
+        assert_eq!(b.get(&[1]), 2.0);
+
+        let c = -a; // owned version
+        assert_eq!(c.get(&[0]), -1.0);
+    }
+
+    #[test]
+    fn test_operator_scalar_mul() {
+        let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
+
+        let b = &a * 3.0; // Tensor * f32
+        let c = 3.0 * &a; // f32 * Tensor
+
+        assert_eq!(b.get(&[0]), 3.0);
+        assert_eq!(c.get(&[0]), 3.0);
+    }
 }
