@@ -421,6 +421,37 @@ impl Div<&Tensor> for &Tensor {
     }
 }
 
+// ----- Scalar multiplication: Tensor * f32 -----
+
+impl Mul<f32> for Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: f32) -> Tensor {
+        self.scalar_mul(rhs)
+    }
+}
+
+impl Mul<f32> for &Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: f32) -> Tensor {
+        self.scalar_mul(rhs)
+    }
+}
+
+// f32 * Tensor
+impl Mul<Tensor> for f32 {
+    type Output = Tensor;
+    fn mul(self, rhs: Tensor) -> Tensor {
+        rhs.scalar_mul(self)
+    }
+}
+
+impl Mul<&Tensor> for f32 {
+    type Output = Tensor;
+    fn mul(self, rhs: &Tensor) -> Tensor {
+        rhs.scalar_mul(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
