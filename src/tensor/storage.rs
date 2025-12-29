@@ -42,3 +42,28 @@ impl Storage {
         self.data.is_empty()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_zeros() {
+        let storage = Storage::zeros(5);
+        assert_eq!(storage.len(), 5);
+        assert_eq!(storage.as_slice(), &[0.0, 0.0, 0.0, 0.0, 0.0]);
+    }
+
+    #[test]
+    fn test_from_vec() {
+        let storage = Storage::from_vec(vec![1.0, 2.0, 3.0]);
+        assert_eq!(storage.as_slice(), &[1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn test_as_mut_slice() {
+        let mut storage = Storage::zeros(3);
+        storage.as_mut_slice()[0] = 42.0;
+        assert_eq!(storage.as_slice()[0], 42.0);
+    }
+}
