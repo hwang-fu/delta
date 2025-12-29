@@ -116,6 +116,111 @@ impl Tensor {
         let idx = self.linear_index(indices);
         self.storage.as_mut_slice()[idx] = value;
     }
+
+    /// Element-wise addition: self + other
+    ///
+    /// # Panics
+    /// Panics if shapes do not match.
+    pub fn add(&self, other: &Tensor) -> Tensor {
+        assert_eq!(
+            self.shape(),
+            other.shape(),
+            "Shape mismatch: {:?} vs {:?}",
+            self.shape(),
+            other.shape()
+        );
+
+        let data: Vec<f32> = self
+            .storage
+            .as_slice()
+            .iter()
+            .zip(other.storage.as_slice())
+            .map(|(a, b)| a + b)
+            .collect();
+
+        Tensor::from_vec(data, self.shape())
+    }
+
+    /// Element-wise subtraction: self - other
+    pub fn sub(&self, other: &Tensor) -> Tensor {
+        assert_eq!(
+            self.shape(),
+            other.shape(),
+            "Shape mismatch: {:?} vs {:?}",
+            self.shape(),
+            other.shape()
+        );
+
+        let data: Vec<f32> = self
+            .storage
+            .as_slice()
+            .iter()
+            .zip(other.storage.as_slice())
+            .map(|(a, b)| a - b)
+            .collect();
+
+        Tensor::from_vec(data, self.shape())
+    }
+
+    /// Element-wise multiplication: self * other (Hadamard product)
+    pub fn mul(&self, other: &Tensor) -> Tensor {
+        assert_eq!(
+            self.shape(),
+            other.shape(),
+            "Shape mismatch: {:?} vs {:?}",
+            self.shape(),
+            other.shape()
+        );
+
+        let data: Vec<f32> = self
+            .storage
+            .as_slice()
+            .iter()
+            .zip(other.storage.as_slice())
+            .map(|(a, b)| a * b)
+            .collect();
+
+        Tensor::from_vec(data, self.shape())
+    }
+
+    /// Element-wise division: self / other
+    pub fn div(&self, other: &Tensor) -> Tensor {
+        assert_eq!(
+            self.shape(),
+            other.shape(),
+            "Shape mismatch: {:?} vs {:?}",
+            self.shape(),
+            other.shape()
+        );
+
+        let data: Vec<f32> = self
+            .storage
+            .as_slice()
+            .iter()
+            .zip(other.storage.as_slice())
+            .map(|(a, b)| a / b)
+            .collect();
+
+        Tensor::from_vec(data, self.shape())
+    }
+
+    /// Add a scalar to all elements
+    pub fn scalar_add(&self, scalar: f32) -> Tensor {
+        let data: Vec<f32> = self.storage.as_slice().iter().map(|x| x + scalar).collect();
+        Tensor::from_vec(data, self.shape())
+    }
+
+    /// Multiply all elements by a scalar
+    pub fn scalar_mul(&self, scalar: f32) -> Tensor {
+        let data: Vec<f32> = self.storage.as_slice().iter().map(|x| x * scalar).collect();
+        Tensor::from_vec(data, self.shape())
+    }
+
+    /// Negate all elements: -self
+    pub fn neg(&self) -> Tensor {
+        let data: Vec<f32> = self.storage.as_slice().iter().map(|x| -x).collect();
+        Tensor::from_vec(data, self.shape())
+    }
 }
 
 #[cfg(test)]
@@ -165,5 +270,80 @@ mod tests {
     #[should_panic(expected = "Data length")]
     fn test_from_vec_shape_mismatch() {
         Tensor::from_vec(vec![1.0, 2.0, 3.0], &[2, 3]); // 3 != 6
+    }
+
+    #[test]
+    fn test_add() {
+        let a = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
+        let b = Tensor::from_vec(vec![4.0, 5.0, 6.0], &[3]);
+        let c = a.add(&b);
+        assert_eq!(c.get(&[0]), 5.0);
+        assert_eq!(c.get(&[1]), 7.0);
+        assert_eq!(c.get(&[2]), 9.0);
+    }
+
+    #[test]
+    fn test_sub() {
+        let a = Tensor::from_vec(vec![5.0, 7.0, 9.0], &[3]);
+        let b = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
+        let c = a.sub(&b);
+        assert_eq!(c.get(&[0]), 4.0);
+        assert_eq!(c.get(&[1]), 5.0);
+        assert_eq!(c.get(&[2]), 6.0);
+    }
+
+    #[test]
+    fn test_mul() {
+        let a = Tensor::from_vec(vec![2.0, 3.0, 4.0], &[3]);
+        let b = Tensor::from_vec(vec![5.0, 6.0, 7.0], &[3]);
+        let c = a.mul(&b);
+        assert_eq!(c.get(&[0]), 10.0);
+        assert_eq!(c.get(&[1]), 18.0);
+        assert_eq!(c.get(&[2]), 28.0);
+    }
+
+    #[test]
+    fn test_div() {
+        let a = Tensor::from_vec(vec![10.0, 20.0, 30.0], &[3]);
+        let b = Tensor::from_vec(vec![2.0, 4.0, 5.0], &[3]);
+        let c = a.div(&b);
+        assert_eq!(c.get(&[0]), 5.0);
+        assert_eq!(c.get(&[1]), 5.0);
+        assert_eq!(c.get(&[2]), 6.0);
+    }
+
+    #[test]
+    fn test_scalar_add() {
+        let a = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
+        let b = a.scalar_add(10.0);
+        assert_eq!(b.get(&[0]), 11.0);
+        assert_eq!(b.get(&[1]), 12.0);
+        assert_eq!(b.get(&[2]), 13.0);
+    }
+
+    #[test]
+    fn test_scalar_mul() {
+        let a = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
+        let b = a.scalar_mul(3.0);
+        assert_eq!(b.get(&[0]), 3.0);
+        assert_eq!(b.get(&[1]), 6.0);
+        assert_eq!(b.get(&[2]), 9.0);
+    }
+
+    #[test]
+    fn test_neg() {
+        let a = Tensor::from_vec(vec![1.0, -2.0, 3.0], &[3]);
+        let b = a.neg();
+        assert_eq!(b.get(&[0]), -1.0);
+        assert_eq!(b.get(&[1]), 2.0);
+        assert_eq!(b.get(&[2]), -3.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "Shape mismatch")]
+    fn test_add_shape_mismatch() {
+        let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
+        let b = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
+        a.add(&b);
     }
 }
