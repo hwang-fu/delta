@@ -178,6 +178,25 @@ impl Tensor {
             .collect();
         Tensor::from_vec(data, self.shape())
     }
+
+    /// Element-wise division: self / other
+    pub fn div(&self, other: &Tensor) -> Tensor {
+        assert_eq!(
+            self.shape(),
+            other.shape(),
+            "Shape mismatch: {:?} vs {:?}",
+            self.shape(),
+            other.shape()
+        );
+        let data: Vec<f32> = self
+            .storage
+            .as_slice()
+            .iter()
+            .zip(other.storage.as_slice())
+            .map(|(a, b)| a / b)
+            .collect();
+        Tensor::from_vec(data, self.shape())
+    }
 }
 
 #[cfg(test)]
