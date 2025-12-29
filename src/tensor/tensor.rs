@@ -14,3 +14,24 @@ pub struct Tensor {
     strides: Vec<usize>,
     offset: usize,
 }
+
+impl Tensor {
+    /// Create a tensor filled with zeros.
+    ///
+    /// # Example
+    /// ```
+    /// use delta::tensor::Tensor;
+    /// let t = Tensor::zeros(&[2, 3]); // 2x3 matrix of zeros
+    /// ```
+    pub fn zeros(shape: &[usize]) -> Self {
+        let shape = Shape::new(shape);
+        let strides = shape.strides();
+        let storage = Storage::zeros(shape.nelems());
+        Self {
+            storage,
+            shape,
+            strides,
+            offset: 0,
+        }
+    }
+}
