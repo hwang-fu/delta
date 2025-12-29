@@ -66,4 +66,10 @@ mod tests {
         storage.as_mut_slice()[0] = 42.0;
         assert_eq!(storage.as_slice()[0], 42.0);
     }
+
+    #[test]
+    fn test_is_empty() {
+        assert!(Storage::zeros(0).is_empty());
+        assert!(!Storage::zeros(1).is_empty());
+    }
 }

@@ -11,6 +11,7 @@ impl Shape {
     ///
     /// # Example
     /// ```
+    /// use delta::tensor::Shape;
     /// let shape = Shape::new(&[2, 3]); // 2 rows, 3 columns
     /// ```
     pub fn new(dims: &[usize]) -> Self {
@@ -103,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_nelems() {
-        assert_eq!(Shape::new(&[]).nelems(), 1);
+        assert_eq!(Shape::new(&[]).nelems(), 1); // empty product = 1
         assert_eq!(Shape::new(&[5]).nelems(), 5);
         assert_eq!(Shape::new(&[2, 3]).nelems(), 6);
         assert_eq!(Shape::new(&[2, 3, 4]).nelems(), 24);
