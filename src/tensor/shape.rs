@@ -82,3 +82,45 @@ impl Shape {
         strides
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_shape_new() {
+        let shape = Shape::new(&[2, 3]);
+        assert_eq!(shape.dims(), &[2, 3]);
+    }
+
+    #[test]
+    fn test_ndim() {
+        assert_eq!(Shape::new(&[]).ndim(), 0); // scalar
+        assert_eq!(Shape::new(&[5]).ndim(), 1); // vector
+        assert_eq!(Shape::new(&[2, 3]).ndim(), 2); // matrix
+        assert_eq!(Shape::new(&[2, 3, 4]).ndim(), 3) // 3D tensor
+    }
+
+    #[test]
+    fn test_nelems() {
+        assert_eq!(Shape::new(&[]).nelems(), 1);
+        assert_eq!(Shape::new(&[5]).nelems(), 5);
+        assert_eq!(Shape::new(&[2, 3]).nelems(), 6);
+        assert_eq!(Shape::new(&[2, 3, 4]).nelems(), 24);
+    }
+
+    #[test]
+    fn test_strides() {
+        // Empty shape
+        assert_eq!(Shape::new(&[]).strides(), vec![]);
+
+        // 1D, strides is always 1
+        assert_eq!(Shape::new(&[5]).strides(), vec![1]);
+
+        // 2D, row-major [rows, cols] -> [cols, 1]
+        assert_eq!(Shape::new(&[2, 3]).strides(), vec![3, 1]);
+
+        // 3D, [depth, rows, cols] -> [rows * cols, cols, 1]
+        assert_eq!(Shape::new(&[2, 3, 4]).strides(), vec![12, 4, 1]);
+    }
+}
