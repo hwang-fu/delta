@@ -64,4 +64,9 @@ impl Tensor {
             offset: 0,
         }
     }
+
+    /// Returns the shape as a slice.
+    pub fn shape(&self) -> &[usize] {
+        self.shape.dims()
+    }
 }
