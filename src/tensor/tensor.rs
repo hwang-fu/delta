@@ -83,7 +83,7 @@ impl Tensor {
     /// Convert multi-dimensional indices to linear memory index.
     ///
     /// Uses strides: index = offset + sum(indices[i] * strides[i])
-    fn linear_index(&self, indices: &[usize]) -> usize {
+    pub fn linear_index(&self, indices: &[usize]) -> usize {
         assert_eq!(
             indices.len(),
             self.ndim(),
@@ -97,5 +97,10 @@ impl Tensor {
                 .zip(&self.strides)
                 .map(|(i, s)| i * s)
                 .sum::<usize>()
+    }
+
+    pub fn get(&self, indices: &[usize]) -> f32 {
+        let idx = self.linear_index(indices);
+        self.storage.as_slice()[idx]
     }
 }
