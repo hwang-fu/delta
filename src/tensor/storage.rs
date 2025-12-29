@@ -26,4 +26,9 @@ impl Storage {
     pub fn as_slice(&self) -> &[f32] {
         &self.data
     }
+
+    /// Returns a mutable slice of the underlying data.
+    pub fn as_mut_slice(&mut self) -> &mut [f32] {
+        &mut self.data
+    }
 }
