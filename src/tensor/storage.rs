@@ -8,7 +8,7 @@ pub struct Storage {
 }
 
 impl Storage {
-    /// Create storage initialized with zeros.
+    /// Create storage initialized with zeros (0.0).
     pub fn zeros(size: usize) -> Self {
         Self {
             data: vec![0.0; size],
