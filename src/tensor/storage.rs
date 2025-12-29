@@ -31,4 +31,9 @@ impl Storage {
     pub fn as_mut_slice(&mut self) -> &mut [f32] {
         &mut self.data
     }
+
+    /// Returns the number of elements in storage.
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
 }
