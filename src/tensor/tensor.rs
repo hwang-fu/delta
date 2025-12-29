@@ -1,3 +1,5 @@
+use std::ops::Neg;
+
 use crate::tensor::{Shape, Storage};
 
 /// A multi-dimensional array with automatic differentiation support.
@@ -280,6 +282,22 @@ impl std::fmt::Display for Tensor {
         write!(f, "Tensor(")?;
         self.fmt_recursive(f, 0, &mut 0)?;
         write!(f, ", shape={:?})", self.shape())
+    }
+}
+
+// ----- Neg (unary minus) -----
+
+impl Neg for Tensor {
+    type Output = Tensor;
+    fn neg(self) -> Tensor {
+        Tensor::neg(&self)
+    }
+}
+
+impl Neg for &Tensor {
+    type Output = Tensor;
+    fn neg(self) -> Tensor {
+        Tensor::neg(self)
     }
 }
 
