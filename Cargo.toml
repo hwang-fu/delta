@@ -1,0 +1,25 @@
+[package]
+name = "delta"
+version = "0.1.0"
+edition = "2024"
+authors = ["Junzhe Wang <junzhe.hwangfu@gmail.com>"]
+description = "A tensor autograd engine from scratch"
+license = "MIT"
+repository = "https://github.com/hwang-fu/delta"
+keywords = ["autograd", "tensor", "machine-learning", "deep-learning"]
+categories = ["science", "mathematics"]
+
+[lib]
+name = "delta"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[dependencies]
+# Core: no dependencies (from scratch)
+
+[dev-dependencies]
+# For testing only
+
+[features]
+default = []
+ffi = []
+parallel = []
