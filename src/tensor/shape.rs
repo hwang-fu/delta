@@ -27,4 +27,9 @@ impl Shape {
     pub fn nelems(&self) -> usize {
         self.dims.iter().product()
     }
+
+    /// Returns a reference to the dimensions slice.
+    pub fn dims(&self) -> &[usize] {
+        &self.dims
+    }
 }
