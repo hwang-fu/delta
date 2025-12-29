@@ -74,4 +74,9 @@ impl Tensor {
     pub fn ndim(&self) -> usize {
         self.shape.ndim()
     }
+
+    /// Returns the total number of elements.
+    pub fn nelems(&self) -> usize {
+        self.shape.nelems()
+    }
 }
