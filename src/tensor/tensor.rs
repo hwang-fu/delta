@@ -221,6 +221,64 @@ impl Tensor {
         let data: Vec<f32> = self.storage.as_slice().iter().map(|x| -x).collect();
         Tensor::from_vec(data, self.shape())
     }
+
+    /// Helper for recursive tensor formatting
+    fn fmt_recursive(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+        dim: usize,
+        offset: &mut usize,
+    ) -> std::fmt::Result {
+        if dim == self.ndim() {
+            // Base case: print single element
+            write!(f, "{:.4}", self.storage.as_slice()[*offset])?;
+            *offset += 1;
+            return Ok(());
+        }
+
+        write!(f, "[")?;
+        let size = self.shape()[dim];
+
+        // Truncate large dimensions
+        let max_items = 6;
+        let truncated = size > max_items;
+
+        for i in 0..size {
+            if truncated && i == max_items / 2 {
+                // Skip middle elements
+                let skip = size - max_items;
+                *offset += skip * self.strides[dim];
+                write!(f, "..., ")?;
+                continue;
+            }
+
+            if truncated && i > max_items / 2 && i < size - max_items / 2 {
+                continue;
+            }
+
+            self.fmt_recursive(f, dim + 1, offset)?;
+
+            if i < size - 1 {
+                write!(f, ", ")?;
+                // Add newline for 2D+ tensors between rows
+                if dim < self.ndim() - 1 {
+                    writeln!(f)?;
+                    // Indent based on depth
+                    for _ in 0..=dim {
+                        write!(f, " ")?;
+                    }
+                }
+            }
+        }
+
+        write!(f, "]")
+    }
+}
+
+impl std::fmt::Display for Tensor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        panic!("todo");
+    }
 }
 
 #[cfg(test)]
@@ -345,11 +403,5 @@ mod tests {
         let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
         let b = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
         a.add(&b);
-    }
-}
-
-impl std::fmt::Display for Tensor {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        panic!("todo");
     }
 }
