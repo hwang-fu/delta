@@ -279,6 +279,25 @@ impl Tensor {
         result
     }
 
+    pub fn transpose(&self) -> Tensor {
+        assert_eq!(
+            self.ndim(),
+            2,
+            "transpose requires 2D tensor, got {}D",
+            self.ndim()
+        );
+
+        let (m, n) = (self.shape()[0], self.shape()[1]);
+
+        let mut result = Tensor::zeros(&[n, m]);
+        for i in 0..m {
+            for j in 0..n {
+                result.set(&[j, i], self.get(&[i, j]));
+            }
+        }
+        result
+    }
+
     /// Helper for recursive tensor formatting
     fn fmt_recursive(
         &self,
