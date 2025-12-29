@@ -14,4 +14,11 @@ impl Storage {
             data: vec![0.0; size],
         }
     }
+
+    /// Create storage from an existing vector.
+    ///
+    /// Takes ownership of the data (no copy).
+    pub fn from_vec(data: Vec<f32>) -> Self {
+        Self { data }
+    }
 }
