@@ -277,7 +277,9 @@ impl Tensor {
 
 impl std::fmt::Display for Tensor {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        panic!("todo");
+        write!(f, "Tensor(")?;
+        self.fmt_recursive(f, 0, &mut 0)?;
+        write!(f, ", shape={:?})", self.shape())
     }
 }
 
@@ -403,5 +405,13 @@ mod tests {
         let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
         let b = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
         a.add(&b);
+    }
+
+    #[test]
+    fn test_display() {
+        let t = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+        let s = format!("{}", t);
+        assert!(s.contains("Tensor"));
+        assert!(s.contains("shape=[2, 3]"));
     }
 }
