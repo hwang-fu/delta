@@ -34,4 +34,34 @@ impl Tensor {
             offset: 0,
         }
     }
+
+    /// Create a tensor from a vector of data.
+    ///
+    /// # Panics
+    /// Panics if data length doesn't match shape.
+    ///
+    /// # Example
+    /// ```
+    /// use delta::tensor::Tensor;
+    /// let t = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    /// ```
+    pub fn from_vec(data: Vec<f32>, shape: &[usize]) -> Self {
+        let shape = Shape::new(shape);
+        assert_eq!(
+            data.len(),
+            shape.nelems(),
+            "Data length {} doesn't match shape {:?} (expected {})",
+            data.len(),
+            shape.dims(),
+            shape.nelems()
+        );
+        let strides = shape.strides();
+        let storage = Storage::from_vec(data);
+        Self {
+            storage,
+            shape,
+            strides,
+            offset: 0,
+        }
+    }
 }
