@@ -79,4 +79,23 @@ impl Tensor {
     pub fn nelems(&self) -> usize {
         self.shape.nelems()
     }
+
+    /// Convert multi-dimensional indices to linear memory index.
+    ///
+    /// Uses strides: index = offset + sum(indices[i] * strides[i])
+    fn linear_index(&self, indices: &[usize]) -> usize {
+        assert_eq!(
+            indices.len(),
+            self.ndim(),
+            "Expected {} indices, got {}",
+            self.ndim(),
+            indices.len()
+        );
+        self.offset
+            + indices
+                .iter()
+                .zip(&self.strides)
+                .map(|(i, s)| i * s)
+                .sum::<usize>()
+    }
 }
