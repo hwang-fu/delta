@@ -1,4 +1,4 @@
-use std::ops::Neg;
+use std::ops::{Add, Neg};
 
 use crate::tensor::{Shape, Storage};
 
@@ -298,6 +298,36 @@ impl Neg for &Tensor {
     type Output = Tensor;
     fn neg(self) -> Tensor {
         Tensor::neg(self)
+    }
+}
+
+// ----- Add -----
+
+impl Add<Tensor> for Tensor {
+    type Output = Tensor;
+    fn add(self, rhs: Tensor) -> Tensor {
+        Tensor::add(&self, &rhs)
+    }
+}
+
+impl Add<&Tensor> for Tensor {
+    type Output = Tensor;
+    fn add(self, rhs: &Tensor) -> Tensor {
+        Tensor::add(&self, rhs)
+    }
+}
+
+impl Add<Tensor> for &Tensor {
+    type Output = Tensor;
+    fn add(self, rhs: Tensor) -> Tensor {
+        Tensor::add(self, &rhs)
+    }
+}
+
+impl Add<&Tensor> for &Tensor {
+    type Output = Tensor;
+    fn add(self, rhs: &Tensor) -> Tensor {
+        Tensor::add(self, rhs)
     }
 }
 
