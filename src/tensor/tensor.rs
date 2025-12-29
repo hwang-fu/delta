@@ -279,6 +279,47 @@ impl Tensor {
         result
     }
 
+    /// Transpose a 2D tensor (swap rows and columns).
+    ///
+    /// For a matrix of shape (M, N), returns shape (N, M).
+    ///
+    /// # Panics
+    /// Panics if tensor is not 2D.
+    ///
+    /// # Example
+    /// ```
+    /// use delta::tensor::Tensor;
+    /// let a = Tensor::from_vec(vec![1.0, 2.0, 3.0,
+    ///                               4.0, 5.0, 6.0], &[2, 3]);
+    /// let b = a.transpose();
+    /// assert_eq!(b.shape(), &[3, 2]);
+    /// assert_eq!(b.get(&[0, 0]), 1.0);
+    /// assert_eq!(b.get(&[0, 1]), 4.0); // was [1, 0]
+    /// ```
+    pub fn transpose(&self) -> Tensor {
+        assert_eq!(
+            self.ndim(),
+            2,
+            "transpose requires 2D tensor, got {}D",
+            self.ndim()
+        );
+
+        let (m, n) = (self.shape()[0], self.shape()[1]);
+
+        let mut result = Tensor::zeros(&[n, m]);
+        for i in 0..m {
+            for j in 0..n {
+                result.set(&[j, i], self.get(&[i, j]));
+            }
+        }
+        result
+    }
+
+    /// Shorthand for transpose (common notation).
+    pub fn t(&self) -> Tensor {
+        self.transpose()
+    }
+
     /// Helper for recursive tensor formatting
     fn fmt_recursive(
         &self,
@@ -723,5 +764,51 @@ mod tests {
         let a = Tensor::zeros(&[2, 3, 4]); // 3D
         let b = Tensor::zeros(&[4, 5]);
         a.matmul(&b);
+    }
+
+    #[test]
+    fn test_transpose() {
+        let a = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+        let b = a.transpose();
+
+        assert_eq!(b.shape(), &[3, 2]);
+
+        // First column of a becomes first row of b
+        assert_eq!(b.get(&[0, 0]), 1.0);
+        assert_eq!(b.get(&[0, 1]), 4.0);
+
+        // Second column of a becomes second row of b
+        assert_eq!(b.get(&[1, 0]), 2.0);
+        assert_eq!(b.get(&[1, 1]), 5.0);
+
+        // Third column of a becomes third row of b
+        assert_eq!(b.get(&[2, 0]), 3.0);
+        assert_eq!(b.get(&[2, 1]), 6.0);
+    }
+
+    #[test]
+    fn test_transpose_twice() {
+        let a = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+        let b = a.transpose().transpose();
+
+        // Should be back to original
+        assert_eq!(b.shape(), &[2, 3]);
+        assert_eq!(b.get(&[0, 0]), 1.0);
+        assert_eq!(b.get(&[1, 2]), 6.0);
+    }
+
+    #[test]
+    fn test_t_shorthand() {
+        let a = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+        let b = a.t();
+        assert_eq!(b.shape(), &[2, 2]);
+        assert_eq!(b.get(&[0, 1]), 3.0); // was [1, 0]
+    }
+
+    #[test]
+    #[should_panic(expected = "transpose requires 2D")]
+    fn test_transpose_not_2d() {
+        let a = Tensor::zeros(&[2, 3, 4]);
+        a.transpose();
     }
 }
