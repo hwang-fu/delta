@@ -224,6 +224,41 @@ impl Tensor {
         Tensor::from_vec(data, self.shape())
     }
 
+    pub fn matmul(&self, other: &Tensor) -> Tensor {
+        assert_eq!(
+            self.ndim(),
+            2,
+            "matmul requires 2D tensors, got {}D",
+            self.ndim()
+        );
+        assert_eq!(
+            other.ndim(),
+            2,
+            "matmul requires 2D tensors, got {}D",
+            other.ndim()
+        );
+
+        let (m, k1) = (self.shape()[0], self.shape()[1]);
+        let (k2, n) = (other.shape()[0], other.shape()[1]);
+        assert_eq!(
+            k1, k2,
+            "Inner dimensions must match: ({}, {}) @ ({}, {})",
+            m, k1, k2, n
+        );
+
+        let mut result = Tensor::zeros(&[m, n]);
+        for i in 0..m {
+            for j in 0..n {
+                let mut sum = 0.0;
+                for k in 0..k1 {
+                    sum += self.get(&[i, k]) * other.get(&[k, j]);
+                }
+                result.set(&[i, j], sum);
+            }
+        }
+        result
+    }
+
     /// Helper for recursive tensor formatting
     fn fmt_recursive(
         &self,
