@@ -209,6 +209,12 @@ impl Tensor {
         let data: Vec<f32> = self.storage.as_slice().iter().map(|x| x * scalar).collect();
         Tensor::from_vec(data, self.shape())
     }
+
+    /// Negate all elements: -self
+    pub fn neg(&self) -> Tensor {
+        let data: Vec<f32> = self.storage.as_slice().iter().map(|x| -x).collect();
+        Tensor::from_vec(data, self.shape())
+    }
 }
 
 #[cfg(test)]
