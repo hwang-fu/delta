@@ -5,3 +5,12 @@
 pub struct Shape {
     dims: Vec<usize>,
 }
+
+impl Shape {
+    /// Creat a new shape from a slice of dimensions.
+    pub fn new(dims: &[usize]) -> Self {
+        Self {
+            dims: dims.to_vec(),
+        }
+    }
+}
