@@ -103,4 +103,9 @@ impl Tensor {
         let idx = self.linear_index(indices);
         self.storage.as_slice()[idx]
     }
+
+    pub fn set(&mut self, indices: &[usize], value: f32) {
+        let idx = self.linear_index(indices);
+        self.storage.as_mut_slice()[idx] = value;
+    }
 }
