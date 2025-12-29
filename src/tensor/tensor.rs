@@ -120,7 +120,7 @@ impl Tensor {
     /// Element-wise addition: self + other
     ///
     /// # Panics
-    /// Panics if shapes don't match.
+    /// Panics if shapes do not match.
     pub fn add(&self, other: &Tensor) -> Tensor {
         assert_eq!(
             self.shape(),
@@ -138,6 +138,25 @@ impl Tensor {
             .map(|(a, b)| a + b)
             .collect();
 
+        Tensor::from_vec(data, self.shape())
+    }
+
+    /// Element-wise subtraction: self - other
+    pub fn sub(&self, other: &Tensor) -> Tensor {
+        assert_eq!(
+            self.shape(),
+            other.shape(),
+            "Shape mismatch: {:?} vs {:?}",
+            self.shape(),
+            other.shape()
+        );
+        let data: Vec<f32> = self
+            .storage
+            .as_slice()
+            .iter()
+            .zip(other.storage.as_slice())
+            .map(|(a, b)| a - b)
+            .collect();
         Tensor::from_vec(data, self.shape())
     }
 }
