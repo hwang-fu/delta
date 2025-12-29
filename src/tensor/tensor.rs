@@ -1,4 +1,4 @@
-use std::ops::{Add, Neg, Sub};
+use std::ops::{Add, Mul, Neg, Sub};
 
 use crate::tensor::{Shape, Storage};
 
@@ -289,14 +289,14 @@ impl std::fmt::Display for Tensor {
 
 impl Neg for Tensor {
     type Output = Tensor;
-    fn neg(self) -> Tensor {
+    fn neg(self) -> Self::Output {
         Tensor::neg(&self)
     }
 }
 
 impl Neg for &Tensor {
     type Output = Tensor;
-    fn neg(self) -> Tensor {
+    fn neg(self) -> Self::Output {
         Tensor::neg(self)
     }
 }
@@ -305,28 +305,28 @@ impl Neg for &Tensor {
 
 impl Add<Tensor> for Tensor {
     type Output = Tensor;
-    fn add(self, rhs: Tensor) -> Tensor {
+    fn add(self, rhs: Tensor) -> Self::Output {
         Tensor::add(&self, &rhs)
     }
 }
 
 impl Add<&Tensor> for Tensor {
     type Output = Tensor;
-    fn add(self, rhs: &Tensor) -> Tensor {
+    fn add(self, rhs: &Tensor) -> Self::Output {
         Tensor::add(&self, rhs)
     }
 }
 
 impl Add<Tensor> for &Tensor {
     type Output = Tensor;
-    fn add(self, rhs: Tensor) -> Tensor {
+    fn add(self, rhs: Tensor) -> Self::Output {
         Tensor::add(self, &rhs)
     }
 }
 
 impl Add<&Tensor> for &Tensor {
     type Output = Tensor;
-    fn add(self, rhs: &Tensor) -> Tensor {
+    fn add(self, rhs: &Tensor) -> Self::Output {
         Tensor::add(self, rhs)
     }
 }
@@ -335,29 +335,59 @@ impl Add<&Tensor> for &Tensor {
 
 impl Sub<Tensor> for Tensor {
     type Output = Tensor;
-    fn sub(self, rhs: Tensor) -> Tensor {
+    fn sub(self, rhs: Tensor) -> Self::Output {
         Tensor::sub(&self, &rhs)
     }
 }
 
 impl Sub<&Tensor> for Tensor {
     type Output = Tensor;
-    fn sub(self, rhs: &Tensor) -> Tensor {
+    fn sub(self, rhs: &Tensor) -> Self::Output {
         Tensor::sub(&self, rhs)
     }
 }
 
 impl Sub<Tensor> for &Tensor {
     type Output = Tensor;
-    fn sub(self, rhs: Tensor) -> Tensor {
+    fn sub(self, rhs: Tensor) -> Self::Output {
         Tensor::sub(self, &rhs)
     }
 }
 
 impl Sub<&Tensor> for &Tensor {
     type Output = Tensor;
-    fn sub(self, rhs: &Tensor) -> Tensor {
+    fn sub(self, rhs: &Tensor) -> Self::Output {
         Tensor::sub(self, rhs)
+    }
+}
+
+// ----- Mul (element-wise) -----
+
+impl Mul<Tensor> for Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: Tensor) -> Tensor {
+        Tensor::mul(&self, &rhs)
+    }
+}
+
+impl Mul<&Tensor> for Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: &Tensor) -> Tensor {
+        Tensor::mul(&self, rhs)
+    }
+}
+
+impl Mul<Tensor> for &Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: Tensor) -> Tensor {
+        Tensor::mul(self, &rhs)
+    }
+}
+
+impl Mul<&Tensor> for &Tensor {
+    type Output = Tensor;
+    fn mul(self, rhs: &Tensor) -> Tensor {
+        Tensor::mul(self, rhs)
     }
 }
 
@@ -482,7 +512,7 @@ mod tests {
     fn test_add_shape_mismatch() {
         let a = Tensor::from_vec(vec![1.0, 2.0], &[2]);
         let b = Tensor::from_vec(vec![1.0, 2.0, 3.0], &[3]);
-        a.add(&b);
+        let _ = a.add(&b);
     }
 
     #[test]
