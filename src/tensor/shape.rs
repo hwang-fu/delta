@@ -13,4 +13,11 @@ impl Shape {
             dims: dims.to_vec(),
         }
     }
+
+    /// Returns the number of dimensions (rank of the tensor).
+    ///
+    /// Scalar = 0, Vector = 1, Matrix = 2, etc.
+    pub fn ndim(&self) -> usize {
+        self.dims.len()
+    }
 }
