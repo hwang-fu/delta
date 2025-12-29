@@ -32,4 +32,24 @@ impl Shape {
     pub fn dims(&self) -> &[usize] {
         &self.dims
     }
+
+    /// Computes row-major (C-style) strides.
+    ///
+    /// Strides tell us how many elements to skip in memory
+    /// to move one step along each dimension.
+    ///
+    /// For shape [2, 3]:
+    ///   - stride[0] = 3 (skip 3 elements to go to next row)
+    ///   - stride[1] = 1 (skip 1 element to go to next column)
+    pub fn strides(&self) -> Vec<usize> {
+        if self.dims.is_empty() {
+            return vec![];
+        }
+
+        let mut strides = vec![1; self.ndim()];
+        for i in (0..self.ndim() - 1).rev() {
+            strides[i] = strides[i + 1] * self.dims[i + 1];
+        }
+        strides
+    }
 }
