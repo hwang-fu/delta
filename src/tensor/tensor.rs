@@ -197,6 +197,12 @@ impl Tensor {
             .collect();
         Tensor::from_vec(data, self.shape())
     }
+
+    /// Multiply all elements by a scalar
+    pub fn scalar_mul(&self, scalar: f32) -> Tensor {
+        let data: Vec<f32> = self.storage.as_slice().iter().map(|x| x * scalar).collect();
+        Tensor::from_vec(data, self.shape())
+    }
 }
 
 #[cfg(test)]
