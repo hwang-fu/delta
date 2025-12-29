@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 use crate::tensor::{Shape, Storage};
 
@@ -388,6 +388,36 @@ impl Mul<&Tensor> for &Tensor {
     type Output = Tensor;
     fn mul(self, rhs: &Tensor) -> Tensor {
         Tensor::mul(self, rhs)
+    }
+}
+
+// ----- Div -----
+
+impl Div<Tensor> for Tensor {
+    type Output = Tensor;
+    fn div(self, rhs: Tensor) -> Tensor {
+        Tensor::div(&self, &rhs)
+    }
+}
+
+impl Div<&Tensor> for Tensor {
+    type Output = Tensor;
+    fn div(self, rhs: &Tensor) -> Tensor {
+        Tensor::div(&self, rhs)
+    }
+}
+
+impl Div<Tensor> for &Tensor {
+    type Output = Tensor;
+    fn div(self, rhs: Tensor) -> Tensor {
+        Tensor::div(self, &rhs)
+    }
+}
+
+impl Div<&Tensor> for &Tensor {
+    type Output = Tensor;
+    fn div(self, rhs: &Tensor) -> Tensor {
+        Tensor::div(self, rhs)
     }
 }
 
