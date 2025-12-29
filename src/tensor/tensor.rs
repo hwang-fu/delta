@@ -69,4 +69,9 @@ impl Tensor {
     pub fn shape(&self) -> &[usize] {
         self.shape.dims()
     }
+
+    /// Returns the number of dimensions.
+    pub fn ndim(&self) -> usize {
+        self.shape.ndim()
+    }
 }
