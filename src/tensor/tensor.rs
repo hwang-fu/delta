@@ -99,13 +99,71 @@ impl Tensor {
                 .sum::<usize>()
     }
 
+    /// Get element at the given indices.
+    ///
+    /// # Panics
+    /// Panics if indices are out of bounds or wrong number of indices.
     pub fn get(&self, indices: &[usize]) -> f32 {
         let idx = self.linear_index(indices);
         self.storage.as_slice()[idx]
     }
 
+    /// Set element at the given indices.
+    ///
+    /// # Panics
+    /// Panics if indices are out of bounds or wrong number of indices.
     pub fn set(&mut self, indices: &[usize], value: f32) {
         let idx = self.linear_index(indices);
         self.storage.as_mut_slice()[idx] = value;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_zeros() {
+        let t = Tensor::zeros(&[2, 3]);
+        assert_eq!(t.shape(), &[2, 3]);
+        assert_eq!(t.ndim(), 2);
+        assert_eq!(t.nelems(), 6);
+        assert_eq!(t.get(&[0, 0]), 0.0);
+        assert_eq!(t.get(&[1, 2]), 0.0);
+    }
+
+    #[test]
+    fn test_from_vec() {
+        let t = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+        // Row 0: [1, 2, 3]
+        // Row 1: [4, 5, 6]
+        assert_eq!(t.get(&[0, 0]), 1.0);
+        assert_eq!(t.get(&[0, 2]), 3.0);
+        assert_eq!(t.get(&[1, 0]), 4.0);
+        assert_eq!(t.get(&[1, 2]), 6.0);
+    }
+
+    #[test]
+    fn test_set() {
+        let mut t = Tensor::zeros(&[2, 2]);
+        t.set(&[0, 1], 42.0);
+        assert_eq!(t.get(&[0, 1]), 42.0);
+        assert_eq!(t.get(&[0, 0]), 0.0);
+    }
+
+    #[test]
+    fn test_linear_index() {
+        let t = Tensor::zeros(&[2, 3]);
+        // strides = [3, 1]
+        assert_eq!(t.linear_index(&[0, 0]), 0);
+        assert_eq!(t.linear_index(&[0, 1]), 1);
+        assert_eq!(t.linear_index(&[1, 0]), 3);
+        assert_eq!(t.linear_index(&[1, 2]), 5);
+    }
+
+    #[test]
+    #[should_panic(expected = "Data length")]
+    fn test_from_vec_shape_mismatch() {
+        Tensor::from_vec(vec![1.0, 2.0, 3.0], &[2, 3]); // 3 != 6
     }
 }
