@@ -20,4 +20,11 @@ impl Shape {
     pub fn ndim(&self) -> usize {
         self.dims.len()
     }
+
+    /// Returns the total number of elements in the tensor.
+    ///
+    /// For shape [2, 3], nelems = 6.
+    pub fn nelems(&self) -> usize {
+        self.dims.iter().product()
+    }
 }
