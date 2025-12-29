@@ -21,4 +21,9 @@ impl Storage {
     pub fn from_vec(data: Vec<f32>) -> Self {
         Self { data }
     }
+
+    /// Returns an immutable slice of the underlying data.
+    pub fn as_slice(&self) -> &[f32] {
+        &self.data
+    }
 }
