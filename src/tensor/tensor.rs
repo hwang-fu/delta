@@ -298,6 +298,11 @@ impl Tensor {
         result
     }
 
+    /// Shorthand for transpose (common notation).
+    pub fn t(&self) -> Tensor {
+        self.transpose()
+    }
+
     /// Helper for recursive tensor formatting
     fn fmt_recursive(
         &self,
